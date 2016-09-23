@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="semantic.min.css">
+    <style type="text/css">
+
+      #mapparent {height:100%}
+      #map { height: 100%;}
+    </style>
+  </head>
+  <body>
+    <div id="mapparent" class="ui grid">
+    <div class="ten wide column">
+        <div class="ui three column grid">
+          <div class="column">
+          <div class="ui fluid card">
+            <div class="image"></div>
+            <div class="content">
+              <div class="header">Title</div>
+              <div class="description">Description</div>
+            </div>
+          </div>
+          </div>
+          <div class="column">
+            <div class="ui fluid card">
+              <div class="image"></div>
+              <div class="content">
+                <div class="header">Title</div>
+                <div class="description">Description</div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    <div class="six wide column" id="map"></div>
+  </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="semantic.min.js"></script>
+    <script type="text/javascript">
+
+    var map;
+    var markers = [];
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 25.0468165, lng:121.507962},
+        zoom: 16
+      });
+      map.addListener('dragend',function(){
+        $.ajax({
+          url: "./api/",
+          jsonp: "callback",
+          dataType: "jsonp",
+          data:{ lat: map.getCenter().lat(),lng: map.getCenter().lng() },
+        });
+      });
+    }
+    function callback(data){
+      console.log(data)
+      deleteMarkers()
+      data.map(function(value,index){
+        var lat = value.location.coordinates[1];
+        var lng = value.location.coordinates[0];
+        addMarker(lat,lng);
+      });
+    }
+    function addMarker(lat,lng) {
+      var marker = new google.maps.Marker({
+        position: { lat: lat, lng: lng},
+        map: map
+      });
+      markers.push(marker);
+    }
+    function showMarkers() {
+      setMapOnAll(map);
+    }
+    function setMapOnAll(map) {
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(map);
+      }
+    }
+    function clearMarkers() {
+      setMapOnAll(null);
+    }
+    function deleteMarkers(){
+      clearMarkers();
+      markers = [];
+    }
+
+</script>
+   <script async defer
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDT75Nu6pfJrIHINphMgx7PvZpL55pxSm8&callback=initMap">
+   </script>
+ </body>
+</html>
