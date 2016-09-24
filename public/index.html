@@ -113,6 +113,10 @@
             resetSelectMarker();
             that.retrieveData();
           });
+          map.addListener('zoom_changed',function(){
+            resetSelectMarker();
+            that.retrieveData();
+          });
           map.addListener('click',function(){
             resetSelectMarker();
           });
@@ -131,9 +135,11 @@
       const ListView = React.createClass({
         cardEnter:function(number){
             markers[number-1].setIcon("images/markers1/number_"+number+".png");
+            markers[number-1].setZIndex(1000);
         },
         cardLeave:function(number){
             markers[number-1].setIcon("images/markers/number_"+number+".png");
+            markers[number-1].setZIndex(1);
         },
         render:function(){
           var data = this.props.data;
@@ -185,6 +191,11 @@
                   <i className="pointing left icon"></i>
                   痞客邦地圖找美食 - GeoPixnet
                   </div>
+              </div>
+              <div className="right menu">
+                <div className="item">
+                <a href="mailto:royal3501@gmail.com" target="_blank">Feedback</a>
+                </div>
               </div>
             </div>
           )
