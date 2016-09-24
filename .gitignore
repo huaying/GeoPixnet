@@ -34,3 +34,5 @@ semantic/*
 semantic.json
 !semantic/dist/semantic.min.css
 !semantic/dist/semantic.min.js
+
+*.DS_Store
