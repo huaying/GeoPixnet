@@ -1,94 +1,266 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="semantic.min.css">
-    <style type="text/css">
+    <meta charset="UTF-8" />
+    <title>痞客邦地圖找美食-GeoPixnet</title>
+    <script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
+    <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
+    <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
+    <script src="https://unpkg.com/jquery@3.1.0/dist/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDT75Nu6pfJrIHINphMgx7PvZpL55pxSm8"></script>
+    <script src="https://cdn.rawgit.com/googlemaps/v3-utility-library/master/infobox/src/infobox_packed.js
+"></script>
+    <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
 
-      #mapparent {height:100%}
-      #map { height: 100%;}
+    <link rel="stylesheet" type="text/css" href="semantic.min.css">
+    <style>
+    html,body {
+      height:100%;
+    }
+    #map {
+       width: 40%;
+       position: fixed !important;
+       bottom: 0;
+       left: 0;
+       top:40px;
+     }
+     #list{
+       padding:10px;
+       margin-left: 40%
+     }
+    #container {
+      height: 100%;
+      margin-top: 40px;
+    }
+
+    .card-image-cropped {
+      height: 175px;
+      overflow:hidden;
+    }
+    .card-image-cropped img {
+      width: 100%;
+    }
+
+    .small.text{
+      font-size:0.9em;
+    }
+
+    .ui.card>.content, .ui.cards>.card>.content{
+      padding: 0.2em 0.8em;
+    }
+    .ui.cards>.focus{
+      background-color:  #ffffe6;
+    }
+    .card h5{
+      color: black;
+      font-size:1em;
+      margin: 0.35em 0;
+    }
     </style>
   </head>
   <body>
-    <div id="mapparent" class="ui grid">
-    <div class="ten wide column">
-        <div class="ui three column grid">
-          <div class="column">
-          <div class="ui fluid card">
-            <div class="image"></div>
-            <div class="content">
-              <div class="header">Title</div>
-              <div class="description">Description</div>
-            </div>
-          </div>
-          </div>
-          <div class="column">
-            <div class="ui fluid card">
-              <div class="image"></div>
-              <div class="content">
-                <div class="header">Title</div>
-                <div class="description">Description</div>
+    <div id="container"></div>
+    <script type="text/jsx">
+      var map;
+      var infowindow;
+      var markers = [];
+
+      const MapView = React.createClass({
+
+        retrieveData: function(){
+          const that = this;
+          var bounds = map.getBounds();
+
+          $.ajax({
+            url: "./api/",
+            dataType: "json",
+            data: {
+              ne_lat: bounds.getNorthEast().lat(),
+              ne_lng: bounds.getNorthEast().lng(),
+              sw_lat: bounds.getSouthWest().lat(),
+              sw_lng: bounds.getSouthWest().lng()
+            },
+            success: function(data){
+              var lat,lng,coordinates_s,coordinates,id=0;
+              that.props.onDataUpdate(data);
+              deleteMarkers()
+
+              for(coordinates_s in data){
+                coordinates = JSON.parse(coordinates_s);
+                lat = coordinates[1];
+                lng = coordinates[0];
+                addMarker(lat,lng,++id, data[coordinates_s][0]);
+              }
+            }
+          });
+        },
+        componentDidMount: function(){
+          const that = this;
+          map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 25.0468165, lng:121.507962},
+            zoom: 16
+          });
+          map.addListener('dragend',function(){
+            resetSelectMarker();
+            that.retrieveData();
+          });
+          map.addListener('click',function(){
+            resetSelectMarker();
+          });
+          google.maps.event.addListenerOnce(map,'bounds_changed', function() {
+            that.retrieveData()
+          });
+
+        },
+
+        render:function(){
+          return (
+            <div id="map"></div>
+          )
+        }
+      })
+      const ListView = React.createClass({
+        cardEnter:function(number){
+            markers[number-1].setIcon("images/markers1/number_"+number+".png");
+        },
+        cardLeave:function(number){
+            markers[number-1].setIcon("images/markers/number_"+number+".png");
+        },
+        render:function(){
+          var data = this.props.data;
+          var stores = [];
+          var store, article, coordinates;
+          var count = 0;
+          for(coordinates in this.props.data){
+            store = data[coordinates];
+            article = store[0];
+            stores.push(
+              <div className="card" id={"card"+(++count)} onMouseEnter={this.cardEnter.bind(this, count)} onMouseLeave={this.cardLeave.bind(this, count)}>
+                  <div className="card-image-cropped image">
+                    <a href={article.url} target="_blank">
+                      <img src={article.images[0]} />
+                    </a>
+                  </div>
+                  <div className="content">
+                    <a href={article.url} target="_blank">
+                      <h5>{article.title}</h5>
+                      <div className="small text description">{article.desc}...</div>
+                    </a>
+                  </div>
+                  <div className="extra content">
+                    <div className="right floated meta">{count}</div>
+                  </div>
+              </div>
+            )
+          }
+          return (
+            <div id="list">
+              <div className="ten wide column">
+                <div className="ui two stackable cards">
+                  {stores}
+                </div>
               </div>
             </div>
-          </div>
-      </div>
-    </div>
-    <div class="six wide column" id="map"></div>
-  </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="semantic.min.js"></script>
-    <script type="text/javascript">
+          )
+        }
+      })
+      const MainMenu = React.createClass({
+        render: function(){
+          return (
+            <div className="ui fixed main menu">
+              <div className="left menu">
+                <div className="item">
+                  <i className="pointing up icon"></i>
+                  <i className="pointing down icon"></i>
+                  <i className="pointing right icon"></i>
+                  <i className="pointing left icon"></i>
+                  痞客邦地圖找美食 - GeoPixnet
+                  </div>
+              </div>
+            </div>
+          )
+        }
+      })
+      const Container = React.createClass({
+          getInitialState: function(){
+            return {data: []};
+          },
+          handleDataUpdate: function(data){
+            this.setState({data:data})
+          },
+          render: function(){
+            return (
+              <div id="container">
+                <MainMenu />
+                <ListView data={this.state.data}/>
+                <MapView onDataUpdate={this.handleDataUpdate}/>
+              </div>
+            )
+          }
+      })
+      ReactDOM.render(
+        <Container />,
+        document.getElementById('container')
+      );
 
-    var map;
-    var markers = [];
-    function initMap() {
-      map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 25.0468165, lng:121.507962},
-        zoom: 16
-      });
-      map.addListener('dragend',function(){
-        $.ajax({
-          url: "./api/",
-          jsonp: "callback",
-          dataType: "jsonp",
-          data:{ lat: map.getCenter().lat(),lng: map.getCenter().lng() },
-        });
-      });
-    }
-    function callback(data){
-      console.log(data)
-      deleteMarkers()
-      data.map(function(value,index){
-        var lat = value.location.coordinates[1];
-        var lng = value.location.coordinates[0];
-        addMarker(lat,lng);
-      });
-    }
-    function addMarker(lat,lng) {
-      var marker = new google.maps.Marker({
-        position: { lat: lat, lng: lng},
-        map: map
-      });
-      markers.push(marker);
-    }
-    function showMarkers() {
-      setMapOnAll(map);
-    }
-    function setMapOnAll(map) {
-      for (var i = 0; i < markers.length; i++) {
-        markers[i].setMap(map);
+      function resetSelectMarker(){
+        if (infowindow){
+          $('.card').removeClass("focus");
+          infowindow.close();
+        }
       }
-    }
-    function clearMarkers() {
-      setMapOnAll(null);
-    }
-    function deleteMarkers(){
-      clearMarkers();
-      markers = [];
-    }
 
-</script>
-   <script async defer
-     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDT75Nu6pfJrIHINphMgx7PvZpL55pxSm8&callback=initMap">
-   </script>
- </body>
+      function addMarker(lat,lng,number,article) {
+        var marker = new google.maps.Marker({
+          position: { lat: lat, lng: lng},
+          map: map,
+          icon: "images/markers/number_"+number+".png"
+        });
+
+        marker.addListener('click',function(){
+          resetSelectMarker();
+          infowindow = new InfoBox({
+            boxStyle: {
+                    background: "#FFF"
+                    ,width: "240px"
+                  },
+            pixelOffset: new google.maps.Size(-120, 0),
+            content: ['<div class="ui card">',
+                          '<div class="card-image-cropped image">',
+                              '<img src='+article.images[0]+' />',
+                          '</div>',
+                          '<div class="content">',
+                            '<h5>'+article.title+'</h5>',
+                          '</div>',
+                        '</div>'
+              ].join(""),
+            closeBoxURL: "",
+          });
+          infowindow.open(map,marker)
+          $('html, body').animate({
+              scrollTop: $("#card"+number).offset().top - 50
+          }, 250);
+          $("#card"+number).addClass("focus");
+        });
+        markers.push(marker);
+      }
+      function showMarkers() {
+        setMapOnAll(map);
+      }
+      function setMapOnAll(map) {
+        for (var i = 0; i < markers.length; i++) {
+          if(map === null) google.maps.event.clearInstanceListeners(markers[i]);
+          markers[i].setMap(map);
+        }
+      }
+      function clearMarkers() {
+        setMapOnAll(null);
+      }
+      function deleteMarkers(){
+        clearMarkers();
+        markers = [];
+      }
+    </script>
+    <script src="semantic.min.js"></script>
+  </body>
 </html>
