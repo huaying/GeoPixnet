@@ -2,7 +2,15 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta name="description" content="地圖搜尋痞客邦超過10萬篇的食記，任何時候都能找到你想要吃的美食！" />
+    <meta name="keywords" content="GeoPixnet,痞客邦找美食,地圖找美食,痞客邦,Taiwan Food,台灣美食,美食,Food,地圖,地圖搜尋,美食地圖,Pixnet" />
+    <meta name="author" content="Hua-Ying Tsai" />
+    <meta name="contact" content="royal3501@gmail.com"/>
+    <meta name="robots" content="index, follow" />
+    <meta name="revisit-after" content="5 days" />
     <title>痞客邦地圖找美食-GeoPixnet</title>
+    <!-- GeoPixnet,地圖找美食,痞客邦找美食 -->
+
     <script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
     <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
     <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
@@ -10,6 +18,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDT75Nu6pfJrIHINphMgx7PvZpL55pxSm8"></script>
     <script src="https://cdn.rawgit.com/googlemaps/v3-utility-library/master/infobox/src/infobox_packed.js
 "></script>
+
     <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
 
     <link rel="stylesheet" type="text/css" href="semantic.min.css">
@@ -49,7 +58,7 @@
       padding: 0.2em 0.8em;
     }
     .ui.cards>.focus{
-      background-color:  #ffffe6;
+      background-color:  #e6f2ff;
     }
     .card h5{
       color: black;
@@ -138,7 +147,7 @@
               <div className="card" id={"card"+(++count)} onMouseEnter={this.cardEnter.bind(this, count)} onMouseLeave={this.cardLeave.bind(this, count)}>
                   <div className="card-image-cropped image">
                     <a href={article.url} target="_blank">
-                      <img src={article.images[0]} />
+                      <img src={filterImage(article.images)} />
                     </a>
                   </div>
                   <div className="content">
@@ -227,7 +236,7 @@
             pixelOffset: new google.maps.Size(-120, 0),
             content: ['<div class="ui card">',
                           '<div class="card-image-cropped image">',
-                              '<img src='+article.images[0]+' />',
+                              '<img src='+filterImage(article.images)+' />',
                           '</div>',
                           '<div class="content">',
                             '<h5>'+article.title+'</h5>',
@@ -259,6 +268,16 @@
       function deleteMarkers(){
         clearMarkers();
         markers = [];
+      }
+      function filterImage(images){
+        //filter gif
+        var i;
+        for(i=0;i<images.length;i++){
+          if((/\.((?!gif).)*$/).test(images[i])){
+            return images[i];
+          }
+        }
+        return 'images/noimage.png';
       }
     </script>
     <script src="semantic.min.js"></script>
