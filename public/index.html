@@ -15,6 +15,7 @@
     <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
     <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
     <script src="https://unpkg.com/jquery@3.1.0/dist/jquery.min.js"></script>
+    <script src="javascripts/js.cookie.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDT75Nu6pfJrIHINphMgx7PvZpL55pxSm8"></script>
     <script src="https://cdn.rawgit.com/googlemaps/v3-utility-library/master/infobox/src/infobox_packed.js
 "></script>
@@ -75,7 +76,11 @@
       var markers = [];
 
       const MapView = React.createClass({
-
+        mapUpdate: function(){
+          resetSelectMarker();
+          Cookies.set('map_info',{lat: map.getCenter().lat(),lng:map.getCenter().lng(),zoom:map.getZoom()});
+          this.retrieveData();
+        },
         retrieveData: function(){
           const that = this;
           var bounds = map.getBounds();
@@ -104,25 +109,22 @@
           });
         },
         componentDidMount: function(){
+          var lat = 25.0468165,lng=121.507962, zoom=16; //Taipei;
           const that = this;
+          const map_info = Cookies.getJSON('map_info');
+          if(!$.isEmptyObject(map_info)){
+            lat = map_info.lat;
+            lng = map_info.lng;
+            zoom = map_info.zoom;
+          }
           map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: 25.0468165, lng:121.507962},
-            zoom: 16
+            center: {lat: lat, lng:lng},
+            zoom: zoom
           });
-          map.addListener('dragend',function(){
-            resetSelectMarker();
-            that.retrieveData();
-          });
-          map.addListener('zoom_changed',function(){
-            resetSelectMarker();
-            that.retrieveData();
-          });
-          map.addListener('click',function(){
-            resetSelectMarker();
-          });
-          google.maps.event.addListenerOnce(map,'bounds_changed', function() {
-            that.retrieveData()
-          });
+          map.addListener('dragend',this.mapUpdate);
+          map.addListener('zoom_changed',this.mapUpdate);
+          map.addListener('click',resetSelectMarker);
+          google.maps.event.addListenerOnce(map,'bounds_changed', this.mapUpdate);
 
         },
 
@@ -150,7 +152,7 @@
             store = data[coordinates];
             article = store[0];
             stores.push(
-              <div className="card" id={"card"+(++count)} onMouseEnter={this.cardEnter.bind(this, count)} onMouseLeave={this.cardLeave.bind(this, count)}>
+              <div className="card" id={"card"+(++count)} key={"card"+count} onMouseEnter={this.cardEnter.bind(this, count)} onMouseLeave={this.cardLeave.bind(this, count)}>
                   <div className="card-image-cropped image">
                     <a href={article.url} target="_blank">
                       <img src={filterImage(article.images)} />
@@ -292,5 +294,6 @@
       }
     </script>
     <script src="semantic.min.js"></script>
+
   </body>
 </html>
