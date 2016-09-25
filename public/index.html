@@ -8,6 +8,8 @@
     <meta name="contact" content="royal3501@gmail.com"/>
     <meta name="robots" content="index, follow" />
     <meta name="revisit-after" content="5 days" />
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
+
     <title>痞客邦地圖找美食-GeoPixnet</title>
     <!-- GeoPixnet,地圖找美食,痞客邦找美食 -->
 
@@ -80,6 +82,9 @@
           resetSelectMarker();
           Cookies.set('map_info',{lat: map.getCenter().lat(),lng:map.getCenter().lng(),zoom:map.getZoom()});
           this.retrieveData();
+          $('html, body').animate({
+              scrollTop: $("#container").offset().top - 50
+          }, 250);
         },
         retrieveData: function(){
           const that = this;
@@ -177,10 +182,33 @@
                   {stores}
                 </div>
               </div>
+              <Footer />
+            </div>
+
+          )
+        }
+      })
+      const Footer = React.createClass({
+        render: function(){
+          return (
+            <div className="ui vertical footer segment">
+              <div className="ui center aligned container">
+                <div className = "ui divider"></div>
+                  <a href="http://huaying.github.io/" target="_blank"><i className="big child icon"></i></a>
+                  <a href="https://www.facebook.com/HuayingTsai" target="_blank"><i className="big facebook f icon"></i></a>
+                  <a href="https://github.com/huaying" target="_blank"><i className="big github icon"></i></a>
+                  <a href="https://www.linkedin.com/in/huayingtsai" target="_blank"><i className="big linkedin icon"></i></a>
+                  <div className = "ui divider"></div>
+                  <div className="content">
+                    <b>痞客邦地圖找美食 - GeoPixnet</b><br/>
+                    <b>Copyright © 2016 Huaying. All Rights Reserved</b>
+                  </div>
+              </div>
             </div>
           )
         }
       })
+
       const MainMenu = React.createClass({
         render: function(){
           return (
@@ -191,12 +219,12 @@
                   <i className="pointing down icon"></i>
                   <i className="pointing right icon"></i>
                   <i className="pointing left icon"></i>
-                  痞客邦地圖找美食 - GeoPixnet
+                  <b>痞客邦地圖找美食 - GeoPixnet</b>
                   </div>
               </div>
               <div className="right menu">
                 <div className="item">
-                <a href="mailto:royal3501@gmail.com" target="_blank">Feedback</a>
+                <a href="mailto:royal3501@gmail.com" target="_blank"><b>Feedback</b></a>
                 </div>
               </div>
             </div>
