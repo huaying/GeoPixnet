@@ -14,11 +14,11 @@
     "less": "^2.7.1",
     "mongodb": "^2.2.10",
     "morgan": "~1.7.0",
-    "semantic-ui": "^2.2.4",
     "serve-favicon": "~2.3.0"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
     "nodemon": "^1.10.2"
+    "semantic-ui": "^2.2.4",
   }
 }
