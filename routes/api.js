@@ -1,6 +1,16 @@
 var express = require('express');
 var router = express.Router();
 
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length; i; i--) {
+        j = Math.floor(Math.random() * i);
+        x = a[i - 1];
+        a[i - 1] = a[j];
+        a[j] = x;
+    }
+}
+
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   const db = req.db;
@@ -15,7 +25,6 @@ router.get('/', function(req, res, next) {
   const query = {
         location: {
           $geoWithin: {
-            //$box: [[sw_lng, sw_lat],[ne_lng, ne_lat]]
             $box: [[sw_lng_i, sw_lat_i],[ne_lng_i, ne_lat_i]]
           },
         }
@@ -29,7 +38,7 @@ router.get('/', function(req, res, next) {
       var key,i,article;
       const ReturenNum = 30;
 
-      //if(data.length > ReturenNum) shuffle(data);
+      shuffle(data);
       for(i=0; i<data.length; i++){
         article = data[i];
         key = JSON.stringify(article.location.coordinates);
