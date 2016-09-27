@@ -37,8 +37,15 @@
        top:45px;
        box-shadow: 0 1px 3px 0 #D4D4D5,0 0 0 1px #D4D4D5;
      }
+     .refresh_button{
+       position: fixed !important;
+       top:55px;
+       left:10px;
+       z-index: 105;
+     }
+
      #list{
-       padding:0 20px;
+       padding:20px;
        margin-left: 40%
      }
     #container {
@@ -48,12 +55,10 @@
 
     .card-image-cropped {
       height: 175px;
-      overflow:hidden;
       box-shadow: 0 1px 1px 0 #D4D4D5,0 0 0 1px #D4D4D5;
-    }
-    .card-image-cropped img{
-      width:100%;
-      height:auto;
+      background-size: cover !important;
+      background-position: center !important;
+      display: block !important;
     }
 
     .small.text{
@@ -65,7 +70,6 @@
     }
     .ui.cards>.card>:first-child{
       border-radius: 0 !important;
-
     }
     .ui.card>.content, .ui.cards>.card>.content{
       padding: 0;
@@ -126,6 +130,8 @@
           const that = this;
           var bounds = map.getBounds();
 
+
+          $('.refresh_button').off('click',this.retrieveData).addClass('loading');
           $.ajax({
             url: "./api/",
             dataType: "json",
@@ -146,6 +152,9 @@
                 lng = coordinates[0];
                 addMarker(lat,lng,++id, data[coordinates_s][0]);
               }
+            },
+            complete: function(){
+              $('.refresh_button').on('click',this.retrieveData).removeClass('loading');
             }
           });
         },
@@ -160,18 +169,28 @@
           }
           map = new google.maps.Map(document.getElementById('map'), {
             center: {lat: lat, lng:lng},
-            zoom: zoom
+            zoom: zoom,
+            disableDefaultUI: true,
+            mapTypeControl: false,
+            zoomControl: true,
+            streetViewControl:true
           });
-          map.addListener('dragend',this.mapUpdate);
-          map.addListener('zoom_changed',this.mapUpdate);
+          // map.addListener('dragend',this.mapUpdate);
+          // map.addListener('zoom_changed',this.mapUpdate);
           map.addListener('click',resetSelectMarker);
+          $('.refresh_button').on('click',this.mapUpdate)
           google.maps.event.addListenerOnce(map,'bounds_changed', this.mapUpdate);
 
         },
 
         render:function(){
           return (
-            <div id="map"></div>
+            <div>
+              <button className="ui circular red icon button refresh_button">
+                <i className="refresh icon"></i>
+              </button>
+              <div id="map"></div>
+            </div>
           )
         }
       })
@@ -189,19 +208,22 @@
           var stores = [];
           var store, article, coordinates;
           var count = 0;
+          var imageStyle = "";
           for(coordinates in this.props.data){
             store = data[coordinates];
             article = store[0];
+            imageStyle = {
+              backgroundImage: 'url('+filterImage(article.images)+')'
+            }
             stores.push(
               <div className="card" id={"card"+(++count)} key={"card"+count} onMouseEnter={this.cardEnter.bind(this, count)} onMouseLeave={this.cardLeave.bind(this, count)}>
-                  <div className="extra content">
-                    <div className="left floated"><b>{count}</b></div>
+                  <a href={article.url} target="_blank">
+                  <div className="ui card-image-cropped image" style={imageStyle}>
+                    <div className="ui yellow ribbon label">
+                      {count}
+                    </div>
                   </div>
-                  <div className="card-image-cropped image">
-                    <a href={article.url} target="_blank">
-                      <img src={filterImage(article.images)} />
-                    </a>
-                  </div>
+                  </a>
                   <div className="content">
                     <a href={article.url} target="_blank">
                       <h5>{article.title}</h5>
@@ -326,8 +348,7 @@
                 },
           pixelOffset: new google.maps.Size(-120, 0),
           content: ['<div class="ui card">',
-                        '<div class="card-image-cropped image">',
-                            '<img src='+filterImage(article.images)+' />',
+                        '<div class="card-image-cropped image" style="background-image:url('+filterImage(article.images)+')">',
                         '</div>',
                         '<div class="content">',
                           '<h5>'+article.title+'</h5>',
