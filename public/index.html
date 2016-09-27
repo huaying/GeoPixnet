@@ -15,7 +15,6 @@
 
     <script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
     <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
-    <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
     <script src="https://unpkg.com/jquery@3.1.0/dist/jquery.min.js"></script>
     <script src="javascripts/js.cookie.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCulEP80NpAdvWtp9sq-YZ6w9oqJZJvlCE"></script>
@@ -28,37 +27,48 @@
     <style>
     html,body {
       height:100%;
+
     }
     #map {
        width: 40%;
        position: fixed !important;
        bottom: 0;
        left: 0;
-       top:46px;
+       top:45px;
+       box-shadow: 0 1px 3px 0 #D4D4D5,0 0 0 1px #D4D4D5;
      }
      #list{
-       padding:10px;
+       padding:0 20px;
        margin-left: 40%
      }
     #container {
       height: 100%;
-      margin-top: 46px;
+      margin-top: 45px;
     }
 
     .card-image-cropped {
       height: 175px;
       overflow:hidden;
+      box-shadow: 0 1px 1px 0 #D4D4D5,0 0 0 1px #D4D4D5;
     }
-    .card-image-cropped img {
-      width: 100%;
+    .card-image-cropped img{
+      width:100%;
+      height:auto;
     }
 
     .small.text{
       font-size:0.9em;
     }
 
+    .ui.cards>.card {
+      box-shadow:none;
+    }
+    .ui.cards>.card>:first-child{
+      border-radius: 0 !important;
+
+    }
     .ui.card>.content, .ui.cards>.card>.content{
-      padding: 0.2em 0.8em;
+      padding: 0;
     }
     .ui.cards>.focus{
       background-color:  #e6f2ff;
@@ -184,6 +194,9 @@
             article = store[0];
             stores.push(
               <div className="card" id={"card"+(++count)} key={"card"+count} onMouseEnter={this.cardEnter.bind(this, count)} onMouseLeave={this.cardLeave.bind(this, count)}>
+                  <div className="extra content">
+                    <div className="left floated"><b>{count}</b></div>
+                  </div>
                   <div className="card-image-cropped image">
                     <a href={article.url} target="_blank">
                       <img src={filterImage(article.images)} />
@@ -195,9 +208,7 @@
                       <div className="small text description">{article.desc}...</div>
                     </a>
                   </div>
-                  <div className="extra content">
-                    <div className="right floated meta">{count}</div>
-                  </div>
+
               </div>
             )
           }
@@ -238,15 +249,12 @@
       const MainMenu = React.createClass({
         render: function(){
           return (
-            <div className="ui fixed main menu">
+            <div className="ui inverted blue fixed main menu">
               <div className="left menu">
                 <div className="item">
-
                   <b>
-                  <i className="pointing up icon"></i>
-                  <i className="pointing down icon"></i>
-                  <i className="pointing right icon"></i>
-                  <i className="pointing left icon"></i>
+                  <i className="map outline icon"></i>
+                  <i className="food icon"></i>
                   地圖美食 - GeoPixnet</b>
                   </div>
               </div>
@@ -304,7 +312,7 @@
           }
 
           $('html, body').animate({
-              scrollTop: $("#card"+number).offset().top - 46 - offset
+              scrollTop: $("#card"+number).offset().top - 45 - offset
           }, 250);
           $("#card"+number).addClass("focus");
         });
