@@ -23,5 +23,8 @@ gulp.task('react', function(){
             .pipe(gulp.dest(dist_dir))
 })
 
+gulp.task('watch', function() {
+    gulp.watch('public/src/**/*.js', ['concat-uglify']);
+});
 //gulp.task('default',['finally'], function(){});
-gulp.task('default',['concat-uglify']);
+gulp.task('default',['watch']);

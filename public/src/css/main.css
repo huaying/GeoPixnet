@@ -25,6 +25,9 @@ html,body {
   margin-top: 45px;
 }
 
+#map .card-image-cropped {
+  height: 75px;
+}
 .card-image-cropped {
   height: 175px;
   box-shadow: 0 1px 1px 0 #D4D4D5,0 0 0 1px #D4D4D5;

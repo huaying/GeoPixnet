@@ -85,11 +85,11 @@ var Map = {
     this.infowindow = new InfoBox({
       boxStyle: {
               background: "#FFF"
-              ,width: "200px"
+              ,width:"150px"
             },
-      pixelOffset: new google.maps.Size(-100, 13),
+      pixelOffset: new google.maps.Size(-75, 13),
       content: ['<div class="ui card">',
-                    '<div class="card-image-cropped image" style="background-image:url('+filterImage(article.images)+')">',
+                    '<div class="card-image-cropped image" style="background-image:url('+filterImage(article.images)+');">',
                     '</div>',
                     '<div class="content">',
                       '<h5>'+article.title+'</h5>',
