@@ -100,6 +100,7 @@ var Map = {
     });
   }
 
+
   ,highlightMarker: function(index){
     this.markers[index].setIcon(this.pinSymbol("#FBBD08"));
     this.markers[index].setZIndex(1000);
